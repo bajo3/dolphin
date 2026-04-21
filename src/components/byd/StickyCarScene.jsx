@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import SceneText from './SceneText'
 import Hotspot from './Hotspot'
 import BatteryAnimation from './BatteryAnimation'
@@ -104,21 +105,28 @@ export default function StickyCarScene({
   activationKeys,
 }) {
   const scene = activeScene ?? scenes[activeIndex]
+  const [selectedHotspot, setSelectedHotspot] = useState(null)
+
+  useEffect(() => {
+    setSelectedHotspot(null)
+  }, [scene?.id])
+
   if (!scene) return null
 
   const sameScene = activeIndex === nextIndex || !nextScene
   const currentOpacity = sameScene ? 1 : 1 - localProgress
   const upcomingOpacity = sameScene ? 0 : localProgress
-  const showBattery = scene.id === 'autonomia'
-  const showSpecs = scene.id === 'tecnologia'
+  const showBattery = scene.id === 'battery'
+  const showSpecs = scene.id === 'screen-closeup' || scene.id === 'wide-cabin'
+  const accent = scene.accent ?? '#c7ff41'
 
   return (
     <div
       style={{
         position: 'relative',
         width: '100%',
-        height: '100vh',
-        minHeight: '100svh',
+        height: '100dvh',
+        minHeight: '100vh',
         background: '#050507',
         overflow: 'hidden',
       }}
@@ -139,12 +147,24 @@ export default function StickyCarScene({
       <div
         style={{
           position: 'absolute',
+          inset: '-20%',
+          zIndex: 2,
+          pointerEvents: 'none',
+          background: `radial-gradient(circle at 80% 18%, ${accent}30 0%, transparent 26%), radial-gradient(circle at 18% 80%, ${accent}18 0%, transparent 24%)`,
+          filter: 'blur(30px)',
+          opacity: 0.95,
+        }}
+      />
+
+      <div
+        style={{
+          position: 'absolute',
           inset: 0,
           pointerEvents: 'none',
           zIndex: 5,
           background: [
-            'radial-gradient(ellipse 110% 80% at 50% 50%, transparent 35%, rgba(0,0,0,0.42) 100%)',
-            'linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.18) 40%, rgba(0,0,0,0.08) 60%, rgba(0,0,0,0.22) 100%)',
+            'radial-gradient(ellipse 110% 80% at 50% 50%, transparent 30%, rgba(0,0,0,0.46) 100%)',
+            'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.24) 40%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.18) 100%)',
           ].join(', '),
         }}
       />
@@ -155,12 +175,52 @@ export default function StickyCarScene({
           inset: 0,
           pointerEvents: 'none',
           zIndex: 6,
-          opacity: 0.032,
+          opacity: 0.03,
           backgroundImage: GRAIN_SVG,
           backgroundSize: '180px 180px',
           backgroundRepeat: 'repeat',
         }}
       />
+
+      <div
+        style={{
+          position: 'absolute',
+          top: '18px',
+          left: '18px',
+          zIndex: 16,
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '10px',
+          padding: '10px 14px',
+          borderRadius: '999px',
+          background: 'rgba(4, 8, 18, 0.5)',
+          border: `1px solid ${accent}40`,
+          color: '#fff',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          boxShadow: '0 14px 40px rgba(0,0,0,0.22)',
+        }}
+      >
+        <span
+          style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '999px',
+            background: accent,
+            boxShadow: `0 0 16px ${accent}`,
+          }}
+        />
+        <span
+          style={{
+            fontSize: '11px',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.72)',
+          }}
+        >
+          BYD Dolphin Mini EV GS
+        </span>
+      </div>
 
       {showBattery && (
         <div style={{ position: 'absolute', inset: 0, zIndex: 15 }}>
@@ -174,14 +234,25 @@ export default function StickyCarScene({
         </div>
       )}
 
-      {scene.hotspots?.map((hotspot, index) => (
-        <Hotspot
-          key={`${scene.id}-${index}`}
-          label={hotspot.label}
-          x={hotspot.x}
-          y={hotspot.y}
-        />
-      ))}
+      {scene.hotspots?.map((hotspot, index) => {
+        const hotspotKey = `${scene.id}-${index}`
+        const active = selectedHotspot === hotspotKey
+
+        return (
+          <Hotspot
+            key={hotspotKey}
+            label={hotspot.label}
+            title={hotspot.title}
+            detail={hotspot.detail}
+            icon={hotspot.icon}
+            x={hotspot.x}
+            y={hotspot.y}
+            active={active}
+            accent={accent}
+            onToggle={() => setSelectedHotspot((prev) => (prev === hotspotKey ? null : hotspotKey))}
+          />
+        )
+      })}
 
       <SceneText
         key={scene.id}
