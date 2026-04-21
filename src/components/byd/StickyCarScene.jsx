@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import SceneText from './SceneText'
 import Hotspot from './Hotspot'
 import BatteryAnimation from './BatteryAnimation'
@@ -22,8 +22,75 @@ function getSceneTransform(scene, progress) {
   return `translate3d(${x}px, ${y}px, 0) scale(${scale})`
 }
 
+function SceneLoadingState({ scene, accent, isLoaded }) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        opacity: isLoaded ? 0 : 1,
+        transition: 'opacity 240ms ease',
+        pointerEvents: 'none',
+        zIndex: 4,
+        background: [
+          `radial-gradient(circle at 20% 20%, ${accent}22 0%, transparent 20%)`,
+          'linear-gradient(180deg, rgba(4,8,18,0.7) 0%, rgba(2,3,8,0.9) 100%)',
+        ].join(', '),
+      }}
+    >
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: scene?.thumb ? `url(${scene.thumb})` : 'none',
+          backgroundSize: 'cover',
+          backgroundPosition: scene?.visual?.objectPosition ?? 'center',
+          filter: 'blur(24px)',
+          transform: 'scale(1.12)',
+          opacity: 0.45,
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '50%',
+          transform: 'translate(-50%, -50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '12px',
+        }}
+      >
+        <div
+          style={{
+            width: '52px',
+            height: '52px',
+            borderRadius: '50%',
+            border: `1px solid ${accent}80`,
+            borderTopColor: 'transparent',
+            animation: 'bydSpin 0.9s linear infinite',
+            boxShadow: `0 0 30px ${accent}33`,
+          }}
+        />
+        <div
+          style={{
+            fontSize: '10px',
+            fontWeight: 700,
+            letterSpacing: '0.16em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.6)',
+          }}
+        >
+          Cargando escena
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function renderSceneLayer(scene, options) {
-  const { opacity, progress, activationKey } = options
+  const { opacity, progress, activationKey, isLoaded, accent } = options
 
   if (!scene) return null
 
@@ -37,7 +104,7 @@ function renderSceneLayer(scene, options) {
           opacity,
           zIndex: opacity > 0 ? 3 : 1,
           pointerEvents: 'none',
-          transition: 'opacity 180ms linear',
+          transition: 'opacity 240ms linear',
           willChange: 'opacity',
         }}
       >
@@ -57,17 +124,37 @@ function renderSceneLayer(scene, options) {
         opacity,
         zIndex: opacity > 0 ? 3 : 1,
         pointerEvents: 'none',
-        transition: 'opacity 180ms linear',
+        transition: 'opacity 240ms linear',
         willChange: 'opacity',
         overflow: 'hidden',
       }}
     >
+      {scene.thumb && (
+        <img
+          src={scene.thumb}
+          alt=""
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            objectPosition: scene.visual?.objectPosition ?? 'center',
+            filter: 'blur(18px)',
+            transform: 'scale(1.08)',
+            opacity: isLoaded ? 0 : 0.65,
+            transition: 'opacity 280ms ease',
+          }}
+        />
+      )}
       <img
         key={`${scene.id}-${activationKey}`}
         src={scene.imagen}
         alt={scene.titulo}
+        decoding="async"
         fetchPriority={opacity > 0.5 ? 'high' : 'auto'}
-        loading="eager"
+        loading={opacity > 0.5 ? 'eager' : 'lazy'}
         style={{
           position: 'absolute',
           inset: 0,
@@ -77,6 +164,8 @@ function renderSceneLayer(scene, options) {
           objectPosition: scene.visual?.objectPosition ?? 'center',
           transform: getSceneTransform(scene, progress),
           willChange: 'transform',
+          opacity: isLoaded ? 1 : 0,
+          transition: 'opacity 300ms ease',
         }}
       />
       {scene.visual?.overlay && (
@@ -91,6 +180,7 @@ function renderSceneLayer(scene, options) {
           }}
         />
       )}
+      <SceneLoadingState scene={scene} accent={accent} isLoaded={isLoaded} />
     </div>
   )
 }
@@ -102,7 +192,9 @@ export default function StickyCarScene({
   activeIndex,
   nextIndex,
   localProgress,
+  globalProgress,
   activationKeys,
+  loadedImages,
 }) {
   const scene = activeScene ?? scenes[activeIndex]
   const [selectedHotspot, setSelectedHotspot] = useState(null)
@@ -111,13 +203,18 @@ export default function StickyCarScene({
     setSelectedHotspot(null)
   }, [scene?.id])
 
+  const sceneIsLoaded = useMemo(
+    () => (url) => !url || loadedImages.has(url),
+    [loadedImages]
+  )
+
   if (!scene) return null
 
   const sameScene = activeIndex === nextIndex || !nextScene
   const currentOpacity = sameScene ? 1 : 1 - localProgress
   const upcomingOpacity = sameScene ? 0 : localProgress
-  const showBattery = scene.id === 'battery'
-  const showSpecs = scene.id === 'screen-closeup' || scene.id === 'wide-cabin'
+  const showBattery = scene.id === 'ev-mobility'
+  const showSpecs = scene.id === 'infotainment' || scene.id === 'dashboard-front'
   const accent = scene.accent ?? '#c7ff41'
 
   return (
@@ -135,6 +232,8 @@ export default function StickyCarScene({
         opacity: currentOpacity,
         progress: localProgress,
         activationKey: activationKeys[activeIndex] || 0,
+        isLoaded: sceneIsLoaded(scene.imagen),
+        accent,
       })}
 
       {!sameScene &&
@@ -142,6 +241,8 @@ export default function StickyCarScene({
           opacity: upcomingOpacity,
           progress: localProgress,
           activationKey: activationKeys[nextIndex] || 0,
+          isLoaded: sceneIsLoaded(nextScene?.imagen),
+          accent: nextScene?.accent ?? accent,
         })}
 
       <div
@@ -150,11 +251,33 @@ export default function StickyCarScene({
           inset: '-20%',
           zIndex: 2,
           pointerEvents: 'none',
-          background: `radial-gradient(circle at 80% 18%, ${accent}30 0%, transparent 26%), radial-gradient(circle at 18% 80%, ${accent}18 0%, transparent 24%)`,
-          filter: 'blur(30px)',
+          background: `radial-gradient(circle at 80% 18%, ${accent}38 0%, transparent 26%), radial-gradient(circle at 18% 80%, ${accent}20 0%, transparent 24%)`,
+          filter: 'blur(34px)',
           opacity: 0.95,
         }}
       />
+
+      <div
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 0,
+          height: '4px',
+          zIndex: 14,
+          background: 'rgba(255,255,255,0.06)',
+        }}
+      >
+        <div
+          style={{
+            width: `${Math.max(4, globalProgress * 100)}%`,
+            height: '100%',
+            background: `linear-gradient(90deg, ${accent}, rgba(255,255,255,0.95))`,
+            boxShadow: `0 0 24px ${accent}`,
+            transition: 'width 120ms linear',
+          }}
+        />
+      </div>
 
       <div
         style={{
@@ -220,6 +343,45 @@ export default function StickyCarScene({
         >
           BYD Dolphin Mini EV GS
         </span>
+      </div>
+
+      <div
+        style={{
+          position: 'absolute',
+          top: '18px',
+          right: '18px',
+          zIndex: 16,
+          padding: '10px 12px',
+          borderRadius: '14px',
+          background: 'rgba(4, 8, 18, 0.48)',
+          border: `1px solid ${accent}35`,
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+          boxShadow: '0 14px 40px rgba(0,0,0,0.18)',
+          maxWidth: 'min(220px, 42vw)',
+        }}
+      >
+        <div
+          style={{
+            fontSize: '10px',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            color: accent,
+            fontWeight: 800,
+          }}
+        >
+          Interactivo
+        </div>
+        <div
+          style={{
+            marginTop: '5px',
+            fontSize: '12px',
+            lineHeight: 1.45,
+            color: 'rgba(255,255,255,0.72)',
+          }}
+        >
+          Toca los iconos para abrir info puntual de luces, pantalla, bateria, llantas y confort.
+        </div>
       </div>
 
       {showBattery && (

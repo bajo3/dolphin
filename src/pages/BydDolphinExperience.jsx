@@ -39,6 +39,11 @@ const globalStyles = `
     50% { box-shadow: 0 4px 34px rgba(37,211,102,0.7), 0 0 0 5px rgba(37,211,102,0.08); }
   }
 
+  @keyframes bydSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
   @keyframes boltFlicker {
     0%, 88%, 100% { opacity: 1; }
     90%  { opacity: 0.55; }

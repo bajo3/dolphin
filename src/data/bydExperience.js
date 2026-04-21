@@ -3,22 +3,33 @@
 // Jesus Diaz Automotores - Tandil
 // ============================================================
 
+const IMAGE_BASE = '/byd-dolphin-semantic-jpg'
+const THUMB_BASE = '/byd-dolphin-semantic-thumb'
+
+function sceneImage(file) {
+  return `${IMAGE_BASE}/${file}.jpg`
+}
+
+function sceneThumb(file) {
+  return `${THUMB_BASE}/${file}.jpg`
+}
+
 export const carImages = {
-  hero: '/byd-dolphin-semantic/01_exterior_front_left_three_quarter.png',
-  frontView: '/byd-dolphin-semantic/02_exterior_front_view.png',
-  sideProfile: '/byd-dolphin-semantic/03_exterior_left_side_profile.png',
-  rearLeft: '/byd-dolphin-semantic/04_exterior_rear_left_three_quarter.png',
-  entryView: '/byd-dolphin-semantic/05_driver_door_open_interior_entry_view.png',
-  cockpitWide: '/byd-dolphin-semantic/06_interior_driver_cockpit_wide_angle.png',
-  seatsSide: '/byd-dolphin-semantic/07_interior_front_seats_side_view.png',
-  evProfile: '/byd-dolphin-semantic/08_exterior_left_side_profile_battery_graphic.png',
-  rearRight: '/byd-dolphin-semantic/09_exterior_rear_right_three_quarter.png',
-  dashboardFront: '/byd-dolphin-semantic/10_interior_dashboard_full_frontal_view.png',
-  infotainmentCloseup: '/byd-dolphin-semantic/11_interior_infotainment_screen_closeup.png',
-  cockpitThreeQuarter: '/byd-dolphin-semantic/12_interior_driver_cockpit_three_quarter.png',
-  detailCollage: '/byd-dolphin-semantic/13_interior_seats_console_door_detail_collage.png',
-  seatsOblique: '/byd-dolphin-semantic/14_interior_front_seats_oblique_view.png',
-  entryStudio: '/byd-dolphin-semantic/15_driver_door_open_cabin_blue_studio.png',
+  heroImage: sceneImage('01_exterior_front_left_three_quarter'),
+  frontViewImage: sceneImage('02_exterior_front_view'),
+  sideProfileImage: sceneImage('03_exterior_left_side_profile'),
+  rearLeftImage: sceneImage('04_exterior_rear_left_three_quarter'),
+  entryViewImage: sceneImage('05_driver_door_open_interior_entry_view'),
+  cockpitImage: sceneImage('06_interior_driver_cockpit_wide_angle'),
+  seatsImage: sceneImage('07_interior_front_seats_side_view'),
+  evSectionImage: sceneImage('08_exterior_left_side_profile_battery_graphic'),
+  rearRightImage: sceneImage('09_exterior_rear_right_three_quarter'),
+  dashboardFrontImage: sceneImage('10_interior_dashboard_full_frontal_view'),
+  infotainmentImage: sceneImage('11_interior_infotainment_screen_closeup'),
+  cockpitThreeQuarterImage: sceneImage('12_interior_driver_cockpit_three_quarter'),
+  detailCollageImage: sceneImage('13_interior_seats_console_door_detail_collage'),
+  seatsObliqueImage: sceneImage('14_interior_front_seats_oblique_view'),
+  entryStudioImage: sceneImage('15_driver_door_open_cabin_blue_studio'),
 }
 
 export const bydExperience = {
@@ -54,22 +65,23 @@ export const bydExperience = {
   escenas: [
     {
       id: 'hero-exterior',
-      imagen: carImages.hero,
+      imagen: carImages.heroImage,
+      thumb: sceneThumb('01_exterior_front_left_three_quarter'),
       titulo: 'BYD Dolphin Mini EV GS.',
-      subtitulo: 'Una apertura hero con la vista 3/4 delantera para presentar el auto desde su mejor angulo.',
+      subtitulo: 'Faros LED, postura urbana y una apertura hero que presenta el auto desde su angulo mas fuerte.',
       accent: '#d7ff45',
       features: [
-        { icon: 'design', label: 'Hero exterior', value: 'Vista 3/4 delantera' },
-        { icon: 'bolt', label: '100% electrico', value: 'Estilo urbano BYD' },
+        { icon: 'spark', label: 'Faros LED', value: 'Firma luminosa delantera' },
+        { icon: 'bolt', label: '100% electrico', value: 'Hatchback urbano BYD' },
       ],
       hotspots: [
         {
-          label: 'Primera impresion',
-          title: 'Diseno frontal marcado',
-          detail: 'La vista 3/4 delantera concentra postura, firma optica y volumen del capot en una sola toma.',
+          label: 'Faros LED',
+          title: 'Identidad luminosa',
+          detail: 'BYD Argentina destaca faros LED como parte del frente del Dolphin Mini.',
           icon: 'spark',
-          x: 31,
-          y: 36,
+          x: 26,
+          y: 39,
         },
       ],
       visual: {
@@ -77,27 +89,28 @@ export const bydExperience = {
         startScale: 1.01,
         endScale: 1.08,
         overlay:
-          'linear-gradient(180deg, rgba(4,10,22,0.18) 0%, rgba(4,10,22,0.02) 34%, rgba(0,0,0,0.48) 100%)',
+          'linear-gradient(180deg, rgba(4,10,22,0.18) 0%, rgba(4,10,22,0.03) 34%, rgba(0,0,0,0.5) 100%)',
       },
     },
     {
       id: 'front-identity',
-      imagen: carImages.frontView,
-      titulo: 'Identidad frontal con luces LED.',
-      subtitulo: 'Una toma frontal centrada ideal para destacar la expresion del frente y la firma visual.',
+      imagen: carImages.frontViewImage,
+      thumb: sceneThumb('02_exterior_front_view'),
+      titulo: 'Frente con primera impresion clara.',
+      subtitulo: 'La vista frontal centrada es la indicada para contar luces, presencia y gesto visual del auto.',
       accent: '#d5ff44',
       features: [
-        { icon: 'spark', label: 'Faros LED', value: 'Lectura frontal clara' },
+        { icon: 'spark', label: 'Frontal LED', value: 'Lectura directa del frente' },
         { icon: 'shield', label: '6 airbags', value: 'Seguridad de serie' },
       ],
       hotspots: [
         {
-          label: 'Luces LED',
-          title: 'Faros delanteros',
-          detail: 'La imagen frontal es la mejor para contar el diseno de luces y la identidad del frente.',
+          label: 'Opticas',
+          title: 'Frente principal',
+          detail: 'Esta escena se reserva para contar la identidad frontal y la firma visual del modelo.',
           icon: 'spark',
           x: 18,
-          y: 38,
+          y: 36,
         },
       ],
       visual: {
@@ -108,22 +121,31 @@ export const bydExperience = {
     },
     {
       id: 'side-profile',
-      imagen: carImages.sideProfile,
+      imagen: carImages.sideProfileImage,
+      thumb: sceneThumb('03_exterior_left_side_profile'),
       titulo: 'Perfil lateral y proporciones.',
-      subtitulo: 'La silueta completa permite explicar largo, distancia entre ejes y presencia urbana.',
+      subtitulo: 'La silueta completa deja explicar largo, batalla y el rodado de 16 pulgadas.',
       accent: '#caff45',
       features: [
-        { icon: 'wheel', label: 'Rodado 16"', value: '185/55 R16' },
+        { icon: 'wheel', label: '16 pulgadas', value: '185/55 R16' },
         { icon: 'space', label: '2.500 mm', value: 'Distancia entre ejes' },
       ],
       hotspots: [
         {
           label: 'Aleacion 16"',
-          title: 'Rodado del Dolphin Mini',
-          detail: 'La ficha tecnica oficial indica ruedas de 16 pulgadas con neumaticos 185/55 R16.',
+          title: 'Rodado oficial',
+          detail: 'La ficha tecnica indica ruedas de 16 pulgadas con neumaticos 185/55 R16.',
           icon: 'wheel',
-          x: 21,
-          y: 74,
+          x: 24,
+          y: 76,
+        },
+        {
+          label: 'Silueta',
+          title: 'Perfil urbano',
+          detail: 'La vista lateral muestra mejor la proporcion compacta y el formato urbano del Dolphin Mini.',
+          icon: 'measure',
+          x: 52,
+          y: 44,
         },
       ],
       visual: {
@@ -134,22 +156,23 @@ export const bydExperience = {
     },
     {
       id: 'rear-left',
-      imagen: carImages.rearLeft,
-      titulo: 'Diseno trasero con continuidad visual.',
-      subtitulo: 'La toma 3/4 trasera izquierda muestra como cierra la linea lateral y la firma posterior.',
+      imagen: carImages.rearLeftImage,
+      thumb: sceneThumb('04_exterior_rear_left_three_quarter'),
+      titulo: 'Diseno trasero con lectura completa.',
+      subtitulo: 'La vista 3/4 trasera izquierda muestra spoiler, cola y cierre de lineas del auto.',
       accent: '#d2ff45',
       features: [
-        { icon: 'design', label: 'Trasera limpia', value: 'Volumenes definidos' },
-        { icon: 'spark', label: 'Firma LED', value: 'Lectura posterior' },
+        { icon: 'design', label: 'Vista 3/4', value: 'Continuidad del lateral al sector trasero' },
+        { icon: 'spark', label: 'Firma trasera', value: 'Lectura visual posterior' },
       ],
       hotspots: [
         {
-          label: 'Visual trasero',
-          title: 'Cierre de lineas',
-          detail: 'La vista 3/4 trasera permite leer spoiler, barra trasera y hombros del auto.',
+          label: 'Sector trasero',
+          title: 'Cierre del diseno',
+          detail: 'Esta toma explica mejor el remate posterior y el trabajo de superficies del auto.',
           icon: 'design',
-          x: 57,
-          y: 30,
+          x: 56,
+          y: 31,
         },
       ],
       visual: {
@@ -160,15 +183,25 @@ export const bydExperience = {
     },
     {
       id: 'rear-right',
-      imagen: carImages.rearRight,
-      titulo: 'Otra lectura del sector posterior.',
-      subtitulo: 'La vista 3/4 trasera derecha suma una segunda perspectiva para reforzar la galeria exterior.',
+      imagen: carImages.rearRightImage,
+      thumb: sceneThumb('09_exterior_rear_right_three_quarter'),
+      titulo: 'Exterior trasero desde el otro angulo.',
+      subtitulo: 'Una segunda vista para reforzar la galeria exterior con otra lectura del volumen posterior.',
       accent: '#68d8ff',
       features: [
-        { icon: 'city', label: 'Compacto urbano', value: 'Maniobrable y expresivo' },
-        { icon: 'design', label: 'Superficies tensas', value: 'Buen trabajo de carroceria' },
+        { icon: 'city', label: 'Formato urbano', value: 'Compacto y agil' },
+        { icon: 'design', label: 'Volumen posterior', value: 'Otra perspectiva del remate' },
       ],
-      hotspots: [],
+      hotspots: [
+        {
+          label: 'Perspectiva trasera',
+          title: 'Vista complementaria',
+          detail: 'Esta toma refuerza la narrativa exterior sin repetir exactamente la misma composicion.',
+          icon: 'design',
+          x: 64,
+          y: 34,
+        },
+      ],
       visual: {
         objectPosition: 'center center',
         startScale: 1.02,
@@ -177,9 +210,10 @@ export const bydExperience = {
     },
     {
       id: 'ev-mobility',
-      imagen: carImages.evProfile,
-      titulo: 'Movilidad electrica en primer plano.',
-      subtitulo: 'La imagen con grafica de bateria es la escena correcta para autonomia, carga y tecnologia EV.',
+      imagen: carImages.evSectionImage,
+      thumb: sceneThumb('08_exterior_left_side_profile_battery_graphic'),
+      titulo: 'La parte electrica entra en escena.',
+      subtitulo: 'Blade Battery de 43.2 kWh, e-Platform 3.0 y autonomia de 380 km NEDC.',
       accent: '#5adfff',
       features: [
         { icon: 'battery', label: '43.2 kWh', value: 'Blade Battery' },
@@ -188,12 +222,20 @@ export const bydExperience = {
       ],
       hotspots: [
         {
-          label: 'Bateria',
-          title: 'Blade Battery',
-          detail: 'Esta escena se reserva para la parte EV porque ya incorpora una lectura visual de energia y bateria.',
+          label: 'Blade Battery',
+          title: 'Tecnologia EV',
+          detail: 'La pagina oficial y la ficha tecnica destacan Blade Battery y e-Platform 3.0 como base del modelo.',
           icon: 'battery',
-          x: 79,
-          y: 27,
+          x: 80,
+          y: 29,
+        },
+        {
+          label: 'Carga rapida',
+          title: 'Uso diario real',
+          detail: 'La ficha argentina publica 10% a 80% en 30 minutos bajo carga rapida.',
+          icon: 'charge',
+          x: 54,
+          y: 42,
         },
       ],
       visual: {
@@ -206,22 +248,23 @@ export const bydExperience = {
     },
     {
       id: 'entry-view',
-      imagen: carImages.entryView,
-      titulo: 'Transicion exterior a interior.',
-      subtitulo: 'La puerta abierta mostrando el acceso a cabina funciona como puente natural entre diseno y habitaculo.',
+      imagen: carImages.entryViewImage,
+      thumb: sceneThumb('05_driver_door_open_interior_entry_view'),
+      titulo: 'Acceso a cabina desde la puerta del conductor.',
+      subtitulo: 'La imagen correcta para la transicion exterior a interior: puerta abierta y cockpit a la vista.',
       accent: '#ceff44',
       features: [
-        { icon: 'door', label: 'Acceso a cabina', value: 'Vista de entrada' },
-        { icon: 'comfort', label: 'Uso diario', value: 'Ingreso simple y comodo' },
+        { icon: 'door', label: 'Puerta abierta', value: 'Ingreso natural a cabina' },
+        { icon: 'comfort', label: 'Entrada comoda', value: 'Escena de acceso' },
       ],
       hotspots: [
         {
-          label: 'Acceso',
-          title: 'Entrada a la cabina',
-          detail: 'La toma muestra exactamente el momento de pasar del exterior al puesto de manejo.',
+          label: 'Ingreso',
+          title: 'Acceso a cabina',
+          detail: 'La puerta abierta y el asiento a la vista hacen de esta la mejor escena para explicar entrada y postura.',
           icon: 'door',
-          x: 24,
-          y: 43,
+          x: 22,
+          y: 45,
         },
       ],
       visual: {
@@ -232,15 +275,25 @@ export const bydExperience = {
     },
     {
       id: 'entry-studio',
-      imagen: carImages.entryStudio,
-      titulo: 'Acceso editorial con atmosfera azul.',
-      subtitulo: 'Una variante visual mas cinematografica para reforzar la transicion hacia el interior.',
+      imagen: carImages.entryStudioImage,
+      thumb: sceneThumb('15_driver_door_open_cabin_blue_studio'),
+      titulo: 'Entrada a cabina con atmosfera editorial.',
+      subtitulo: 'Una toma azul mas inmersiva para reforzar la narrativa antes de entrar al cockpit.',
       accent: '#67d7ff',
       features: [
-        { icon: 'door', label: 'Puerta abierta', value: 'Entrada protagonista' },
-        { icon: 'screen', label: 'Cabina visible', value: 'Cockpit a primera vista' },
+        { icon: 'door', label: 'Transicion visual', value: 'Exterior a interior' },
+        { icon: 'screen', label: 'Cabina protagonista', value: 'Cockpit ya visible' },
       ],
-      hotspots: [],
+      hotspots: [
+        {
+          label: 'Cockpit visible',
+          title: 'Primer vistazo interior',
+          detail: 'La composicion editorial deja ver volante, pantalla y acceso en una sola escena.',
+          icon: 'screen',
+          x: 69,
+          y: 35,
+        },
+      ],
       visual: {
         objectPosition: 'center center',
         startScale: 1.03,
@@ -249,9 +302,10 @@ export const bydExperience = {
     },
     {
       id: 'cockpit-wide',
-      imagen: carImages.cockpitWide,
+      imagen: carImages.cockpitImage,
+      thumb: sceneThumb('06_interior_driver_cockpit_wide_angle'),
       titulo: 'Cockpit amplio del conductor.',
-      subtitulo: 'La vista general del puesto de manejo sirve para presentar volante, tablero y consola en conjunto.',
+      subtitulo: 'Volante, tablero y consola aparecen juntos en una vista amplia y clara.',
       accent: '#d4ff43',
       features: [
         { icon: 'wheel', label: 'Volante multifuncion', value: 'Comandos al alcance' },
@@ -259,12 +313,20 @@ export const bydExperience = {
       ],
       hotspots: [
         {
-          label: 'Puesto de manejo',
-          title: 'Cockpit completo',
-          detail: 'Esta toma amplia es la correcta para explicar ergonomia y distribucion general.',
+          label: 'Volante',
+          title: 'Puesto de manejo',
+          detail: 'La vista amplia es ideal para explicar ergonomia y disposicion de controles.',
           icon: 'wheel',
-          x: 27,
-          y: 39,
+          x: 26,
+          y: 42,
+        },
+        {
+          label: 'Consola',
+          title: 'Uso diario',
+          detail: 'La consola central resalta la practicidad del habitaculo para manejo urbano.',
+          icon: 'storage',
+          x: 56,
+          y: 54,
         },
       ],
       visual: {
@@ -275,22 +337,23 @@ export const bydExperience = {
     },
     {
       id: 'dashboard-front',
-      imagen: carImages.dashboardFront,
+      imagen: carImages.dashboardFrontImage,
+      thumb: sceneThumb('10_interior_dashboard_full_frontal_view'),
       titulo: 'Tablero completo de frente.',
-      subtitulo: 'La vista frontal total del interior deja leer simetria, espacio y organizacion de la cabina.',
+      subtitulo: 'Una vista frontal total para mostrar espacio, tablero y simetria interior.',
       accent: '#62d8ff',
       features: [
-        { icon: 'screen', label: 'Pantalla 10.1"', value: 'Centro multimedia' },
+        { icon: 'screen', label: 'Pantalla 10.1"', value: 'Centro multimedia giratorio' },
         { icon: 'comfort', label: 'Cabina abierta', value: 'Lectura total del interior' },
       ],
       hotspots: [
         {
-          label: 'Vista total',
-          title: 'Layout interior',
-          detail: 'Ideal para mostrar tablero, consola flotante y espacio entre plazas delanteras.',
-          icon: 'platform',
-          x: 50,
-          y: 34,
+          label: 'Pantalla',
+          title: 'Multimedia central',
+          detail: 'La ficha argentina indica pantalla giratoria de 10.1 pulgadas.',
+          icon: 'screen',
+          x: 52,
+          y: 28,
         },
       ],
       visual: {
@@ -301,15 +364,25 @@ export const bydExperience = {
     },
     {
       id: 'cockpit-three-quarter',
-      imagen: carImages.cockpitThreeQuarter,
+      imagen: carImages.cockpitThreeQuarterImage,
+      thumb: sceneThumb('12_interior_driver_cockpit_three_quarter'),
       titulo: 'Cockpit en vista 3/4.',
-      subtitulo: 'Complementa la toma amplia con una lectura mas cercana de volante, tablero y consola central.',
+      subtitulo: 'Una toma mas cercana del conductor para reforzar volante, consola y tablero.',
       accent: '#d4ff45',
       features: [
         { icon: 'screen', label: 'Interfaz BYD', value: 'Centro de control' },
-        { icon: 'storage', label: 'Consola practica', value: 'Uso diario mas simple' },
+        { icon: 'storage', label: 'Consola practica', value: 'Objetos al alcance' },
       ],
-      hotspots: [],
+      hotspots: [
+        {
+          label: 'Volante + consola',
+          title: 'Cockpit 3/4',
+          detail: 'Esta escena complementa la vista frontal con mas sensacion de uso real desde la puerta.',
+          icon: 'wheel',
+          x: 38,
+          y: 40,
+        },
+      ],
       visual: {
         objectPosition: 'center center',
         startScale: 1.03,
@@ -318,22 +391,23 @@ export const bydExperience = {
     },
     {
       id: 'seats-side',
-      imagen: carImages.seatsSide,
+      imagen: carImages.seatsImage,
+      thumb: sceneThumb('07_interior_front_seats_side_view'),
       titulo: 'Asientos delanteros y ergonomia.',
-      subtitulo: 'La vista lateral de butacas es la mejor para hablar de postura, soporte y confort.',
+      subtitulo: 'La vista lateral de butacas es la correcta para hablar de postura, soporte y confort.',
       accent: '#cbff43',
       features: [
-        { icon: 'seat', label: 'Asientos delanteros', value: 'Lectura lateral completa' },
-        { icon: 'adjust', label: 'Version GS', value: 'Ajustes electricos' },
+        { icon: 'seat', label: 'Asientos sport', value: 'Lectura lateral completa' },
+        { icon: 'adjust', label: 'GS electrico', value: 'Conductor 6 vias / pasajero 4 vias' },
       ],
       hotspots: [
         {
-          label: 'Confort',
-          title: 'Butacas delanteras',
-          detail: 'Esta toma esta dedicada especificamente a asientos, materiales y apoyo lateral.',
+          label: 'Butacas',
+          title: 'Confort delantero',
+          detail: 'La version GS informa ajuste electrico en conductor y pasajero en la ficha argentina.',
           icon: 'seat',
-          x: 33,
-          y: 54,
+          x: 34,
+          y: 47,
         },
       ],
       visual: {
@@ -344,15 +418,25 @@ export const bydExperience = {
     },
     {
       id: 'seats-oblique',
-      imagen: carImages.seatsOblique,
+      imagen: carImages.seatsObliqueImage,
+      thumb: sceneThumb('14_interior_front_seats_oblique_view'),
       titulo: 'Confort interior desde la puerta.',
-      subtitulo: 'La vista oblicua suma perspectiva para mostrar butacas, consola y acceso en una misma escena.',
+      subtitulo: 'La vista oblicua suma una mejor lectura de butacas, consola y habitabilidad delantera.',
       accent: '#66d8ff',
       features: [
         { icon: 'seat', label: 'Habitabilidad', value: 'Interior util y claro' },
-        { icon: 'comfort', label: 'Cabina comoda', value: 'Ambiente diario' },
+        { icon: 'comfort', label: 'Uso diario', value: 'Ingreso y postura' },
       ],
-      hotspots: [],
+      hotspots: [
+        {
+          label: 'Asiento conductor',
+          title: 'Postura y apoyo',
+          detail: 'La toma oblicua deja ver mejor el perfil del respaldo y la integracion con la consola.',
+          icon: 'seat',
+          x: 34,
+          y: 44,
+        },
+      ],
       visual: {
         objectPosition: 'center center',
         startScale: 1.03,
@@ -361,12 +445,13 @@ export const bydExperience = {
     },
     {
       id: 'infotainment',
-      imagen: carImages.infotainmentCloseup,
+      imagen: carImages.infotainmentImage,
+      thumb: sceneThumb('11_interior_infotainment_screen_closeup'),
       titulo: 'Pantalla y conectividad al centro.',
-      subtitulo: 'El close-up de infotainment es la escena correcta para multimedia, CarPlay y Android Auto.',
+      subtitulo: 'Apple CarPlay, Android Auto y control por voz en la escena correcta: el close-up multimedia.',
       accent: '#61d7ff',
       features: [
-        { icon: 'carplay', label: 'CarPlay', value: 'Compatible' },
+        { icon: 'carplay', label: 'Apple CarPlay', value: 'Compatible' },
         { icon: 'android', label: 'Android Auto', value: 'Compatible' },
         { icon: 'voice', label: 'Hi, BYD', value: 'Control por voz' },
       ],
@@ -374,10 +459,18 @@ export const bydExperience = {
         {
           label: 'Pantalla 10.1"',
           title: 'Infotainment',
-          detail: 'La toma cerrada coincide exactamente con la seccion de conectividad y pantalla central.',
+          detail: 'La web oficial BYD Argentina informa pantalla giratoria de 10.1" con CarPlay y Android Auto.',
           icon: 'screen',
-          x: 77,
-          y: 23,
+          x: 76,
+          y: 24,
+        },
+        {
+          label: 'Comandos fisicos',
+          title: 'Acceso rapido',
+          detail: 'La toma tambien deja ver la botonera y salidas de aire bajo la pantalla central.',
+          icon: 'switch',
+          x: 58,
+          y: 46,
         },
       ],
       visual: {
@@ -390,21 +483,22 @@ export const bydExperience = {
     },
     {
       id: 'detail-collage',
-      imagen: carImages.detailCollage,
+      imagen: carImages.detailCollageImage,
+      thumb: sceneThumb('13_interior_seats_console_door_detail_collage'),
       titulo: 'Detalles de interior y consola.',
-      subtitulo: 'El collage se reserva para materiales, apoyabrazos, mandos y pequenos features del habitaculo.',
+      subtitulo: 'El collage final concentra apoyabrazos, consola, panel de puerta y terminaciones de cabina.',
       accent: '#d8ff44',
       features: [
-        { icon: 'storage', label: 'Consola', value: 'Espacios y apoyos' },
+        { icon: 'storage', label: 'Consola', value: 'Portaobjetos y apoyos' },
         { icon: 'switch', label: 'Mandos', value: 'Lectura de detalles' },
       ],
       hotspots: [
         {
-          label: 'Detalles',
-          title: 'Consola y puertas',
-          detail: 'La composicion multipanel es ideal para cerrar la parte interior con foco en acabados y uso.',
+          label: 'Detalle interior',
+          title: 'Acabados y uso',
+          detail: 'La composicion multipanel se usa para cerrar la narrativa interior con foco en materiales y funciones.',
           icon: 'storage',
-          x: 58,
+          x: 56,
           y: 48,
         },
       ],

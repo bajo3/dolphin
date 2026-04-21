@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { bydExperience } from '../../data/bydExperience'
 import StickyCarScene from './StickyCarScene'
 import FloatingCTA from './FloatingCTA'
@@ -40,6 +40,23 @@ function getStageStyle(mode) {
   }
 }
 
+function preloadImage(url, onComplete) {
+  if (!url) return () => {}
+
+  const img = new Image()
+  img.decoding = 'async'
+
+  const handleComplete = () => onComplete(url)
+  img.addEventListener('load', handleComplete, { once: true })
+  img.addEventListener('error', handleComplete, { once: true })
+  img.src = url
+
+  return () => {
+    img.removeEventListener('load', handleComplete)
+    img.removeEventListener('error', handleComplete)
+  }
+}
+
 export default function BydScrollExperience() {
   const scenes = bydExperience.escenas
   const [scrollState, setScrollState] = useState({
@@ -52,9 +69,57 @@ export default function BydScrollExperience() {
   const [activationKeys, setActivationKeys] = useState(() =>
     Object.fromEntries(scenes.map((_, index) => [index, index === 0 ? 1 : 0]))
   )
+  const [loadedImages, setLoadedImages] = useState(() => new Set())
   const containerRef = useRef(null)
   const previousIndexRef = useRef(0)
   const tickingRef = useRef(false)
+
+  const sceneImageUrls = useMemo(
+    () => scenes.flatMap((scene) => [scene.thumb, scene.imagen].filter(Boolean)),
+    [scenes]
+  )
+
+  useEffect(() => {
+    const initialUrls = scenes
+      .slice(0, 3)
+      .flatMap((scene) => [scene.thumb, scene.imagen].filter(Boolean))
+
+    const cleanups = initialUrls.map((url) =>
+      preloadImage(url, (loadedUrl) => {
+        setLoadedImages((prev) => {
+          if (prev.has(loadedUrl)) return prev
+          const next = new Set(prev)
+          next.add(loadedUrl)
+          return next
+        })
+      })
+    )
+
+    return () => cleanups.forEach((cleanup) => cleanup())
+  }, [scenes])
+
+  useEffect(() => {
+    const preloadTargets = [
+      scenes[scrollState.activeIndex],
+      scenes[scrollState.nextIndex],
+      scenes[Math.min(scrollState.nextIndex + 1, scenes.length - 1)],
+    ]
+      .filter(Boolean)
+      .flatMap((scene) => [scene.thumb, scene.imagen].filter(Boolean))
+
+    const cleanups = preloadTargets.map((url) =>
+      preloadImage(url, (loadedUrl) => {
+        setLoadedImages((prev) => {
+          if (prev.has(loadedUrl)) return prev
+          const next = new Set(prev)
+          next.add(loadedUrl)
+          return next
+        })
+      })
+    )
+
+    return () => cleanups.forEach((cleanup) => cleanup())
+  }, [scenes, scrollState.activeIndex, scrollState.nextIndex])
 
   useEffect(() => {
     function calculateScrollState() {
@@ -171,7 +236,10 @@ export default function BydScrollExperience() {
           activeIndex={scrollState.activeIndex}
           nextIndex={scrollState.nextIndex}
           localProgress={scrollState.localProgress}
+          globalProgress={scrollState.progress}
           activationKeys={activationKeys}
+          loadedImages={loadedImages}
+          totalImageCount={sceneImageUrls.length}
         />
         <ScrollProgress current={scrollState.activeIndex} total={scenes.length} />
         <FloatingCTA />
