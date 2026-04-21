@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { bydExperience } from '../../data/bydExperience'
 import SceneText from './SceneText'
 import Hotspot from './Hotspot'
 import BatteryAnimation from './BatteryAnimation'
 import SpecOverlay from './SpecOverlay'
 import ChargingScene from './ChargingScene'
+import { Icon } from './icons'
 
 const GRAIN_SVG = `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
 
@@ -195,18 +197,40 @@ export default function StickyCarScene({
   globalProgress,
   activationKeys,
   loadedImages,
+  isAutoPlaying,
+  onToggleAutoPlay,
 }) {
   const scene = activeScene ?? scenes[activeIndex]
   const [selectedHotspot, setSelectedHotspot] = useState(null)
+  const [showHint, setShowHint] = useState(false)
+  const hasInteractedRef = useRef(false)
 
   useEffect(() => {
     setSelectedHotspot(null)
   }, [scene?.id])
 
+  // Show/hide "Interactivo" hint per scene
+  useEffect(() => {
+    const hasHotspots = (scene?.hotspots?.length ?? 0) > 0
+    if (!hasInteractedRef.current && hasHotspots && !isAutoPlaying) {
+      setShowHint(true)
+      const t = setTimeout(() => setShowHint(false), 5000)
+      return () => clearTimeout(t)
+    } else {
+      setShowHint(false)
+    }
+  }, [scene?.id, isAutoPlaying])
+
   const sceneIsLoaded = useMemo(
     () => (url) => !url || loadedImages.has(url),
     [loadedImages]
   )
+
+  function handleHotspotToggle(hotspotKey) {
+    hasInteractedRef.current = true
+    setShowHint(false)
+    setSelectedHotspot((prev) => (prev === hotspotKey ? null : hotspotKey))
+  }
 
   if (!scene) return null
 
@@ -216,6 +240,14 @@ export default function StickyCarScene({
   const showBattery = scene.id === 'ev-mobility'
   const showSpecs = scene.id === 'infotainment' || scene.id === 'dashboard-front'
   const accent = scene.accent ?? '#c7ff41'
+  const isHero = activeIndex === 0
+
+  const { auto } = bydExperience
+  const waUrl = `https://wa.me/${auto.whatsapp}?text=${encodeURIComponent(auto.whatsappMensaje)}`
+
+  const heroCta = isHero
+    ? { waUrl, onAutoPlay: onToggleAutoPlay, isAutoPlaying }
+    : null
 
   return (
     <div
@@ -228,6 +260,7 @@ export default function StickyCarScene({
         overflow: 'hidden',
       }}
     >
+      {/* Scene images */}
       {renderSceneLayer(scene, {
         opacity: currentOpacity,
         progress: localProgress,
@@ -245,6 +278,7 @@ export default function StickyCarScene({
           accent: nextScene?.accent ?? accent,
         })}
 
+      {/* Radial glow matching scene accent */}
       <div
         style={{
           position: 'absolute',
@@ -254,31 +288,34 @@ export default function StickyCarScene({
           background: `radial-gradient(circle at 80% 18%, ${accent}38 0%, transparent 26%), radial-gradient(circle at 18% 80%, ${accent}20 0%, transparent 24%)`,
           filter: 'blur(34px)',
           opacity: 0.95,
+          transition: 'background 0.6s ease',
         }}
       />
 
+      {/* Scroll progress bar */}
       <div
         style={{
           position: 'absolute',
           left: 0,
           right: 0,
           top: 0,
-          height: '4px',
+          height: '3px',
           zIndex: 14,
           background: 'rgba(255,255,255,0.06)',
         }}
       >
         <div
           style={{
-            width: `${Math.max(4, globalProgress * 100)}%`,
+            width: `${Math.max(2, globalProgress * 100)}%`,
             height: '100%',
-            background: `linear-gradient(90deg, ${accent}, rgba(255,255,255,0.95))`,
-            boxShadow: `0 0 24px ${accent}`,
-            transition: 'width 120ms linear',
+            background: `linear-gradient(90deg, ${accent}, rgba(255,255,255,0.92))`,
+            boxShadow: `0 0 20px ${accent}`,
+            transition: 'width 120ms linear, background 0.5s ease',
           }}
         />
       </div>
 
+      {/* Vignette overlay */}
       <div
         style={{
           position: 'absolute',
@@ -286,12 +323,13 @@ export default function StickyCarScene({
           pointerEvents: 'none',
           zIndex: 5,
           background: [
-            'radial-gradient(ellipse 110% 80% at 50% 50%, transparent 30%, rgba(0,0,0,0.46) 100%)',
-            'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.24) 40%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.18) 100%)',
+            'radial-gradient(ellipse 110% 80% at 50% 50%, transparent 30%, rgba(0,0,0,0.44) 100%)',
+            'linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.22) 40%, rgba(0,0,0,0.1) 60%, rgba(0,0,0,0.18) 100%)',
           ].join(', '),
         }}
       />
 
+      {/* Grain texture */}
       <div
         style={{
           position: 'absolute',
@@ -305,6 +343,7 @@ export default function StickyCarScene({
         }}
       />
 
+      {/* Top-left: brand pill */}
       <div
         style={{
           position: 'absolute',
@@ -314,14 +353,15 @@ export default function StickyCarScene({
           display: 'inline-flex',
           alignItems: 'center',
           gap: '10px',
-          padding: '10px 14px',
+          padding: '9px 14px',
           borderRadius: '999px',
           background: 'rgba(4, 8, 18, 0.5)',
           border: `1px solid ${accent}40`,
           color: '#fff',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
-          boxShadow: '0 14px 40px rgba(0,0,0,0.22)',
+          boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+          transition: 'border-color 0.5s ease',
         }}
       >
         <span
@@ -330,7 +370,9 @@ export default function StickyCarScene({
             height: '8px',
             borderRadius: '999px',
             background: accent,
-            boxShadow: `0 0 16px ${accent}`,
+            boxShadow: `0 0 14px ${accent}`,
+            flexShrink: 0,
+            transition: 'background 0.5s ease, box-shadow 0.5s ease',
           }}
         />
         <span
@@ -345,57 +387,124 @@ export default function StickyCarScene({
         </span>
       </div>
 
-      <div
-        style={{
-          position: 'absolute',
-          top: '18px',
-          right: '18px',
-          zIndex: 16,
-          padding: '10px 12px',
-          borderRadius: '14px',
-          background: 'rgba(4, 8, 18, 0.48)',
-          border: `1px solid ${accent}35`,
-          backdropFilter: 'blur(14px)',
-          WebkitBackdropFilter: 'blur(14px)',
-          boxShadow: '0 14px 40px rgba(0,0,0,0.18)',
-          maxWidth: 'min(220px, 42vw)',
-        }}
-      >
-        <div
+      {/* Top-right: autoplay indicator OR "Interactivo" hint */}
+      {isAutoPlaying ? (
+        <button
+          type="button"
+          onClick={onToggleAutoPlay}
+          aria-label="Pausar presentación"
           style={{
-            fontSize: '10px',
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            color: accent,
-            fontWeight: 800,
-          }}
-        >
-          Interactivo
-        </div>
-        <div
-          style={{
-            marginTop: '5px',
+            position: 'absolute',
+            top: '18px',
+            right: '18px',
+            zIndex: 16,
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '9px 14px',
+            borderRadius: '999px',
+            background: 'rgba(4, 8, 18, 0.55)',
+            border: `1px solid ${accent}55`,
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            color: '#fff',
             fontSize: '12px',
-            lineHeight: 1.45,
-            color: 'rgba(255,255,255,0.72)',
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            cursor: 'pointer',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.18)',
           }}
         >
-          Toca los iconos para abrir info puntual de luces, pantalla, bateria, llantas y confort.
+          <span
+            style={{
+              width: '7px',
+              height: '7px',
+              borderRadius: '50%',
+              background: accent,
+              boxShadow: `0 0 10px ${accent}`,
+              animation: 'hotspotGlow 1.8s ease-in-out infinite',
+              flexShrink: 0,
+            }}
+          />
+          <span style={{ color: 'rgba(255,255,255,0.7)', letterSpacing: '0.04em' }}>
+            Presentación
+          </span>
+          <span style={{ color: accent }}>
+            <Icon name="pause" size={12} />
+          </span>
+        </button>
+      ) : showHint ? (
+        <div
+          style={{
+            position: 'absolute',
+            top: '18px',
+            right: '18px',
+            zIndex: 16,
+            padding: '10px 12px',
+            borderRadius: '14px',
+            background: 'rgba(4, 8, 18, 0.48)',
+            border: `1px solid ${accent}35`,
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.18)',
+            maxWidth: 'min(200px, 40vw)',
+            animation: 'slideUpFade 0.4s ease both',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '10px',
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+              color: accent,
+              fontWeight: 800,
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            }}
+          >
+            Interactivo
+          </div>
+          <div
+            style={{
+              marginTop: '4px',
+              fontSize: '11px',
+              lineHeight: 1.5,
+              color: 'rgba(255,255,255,0.65)',
+              fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+            }}
+          >
+            Tocá los puntos para ver información del auto.
+          </div>
         </div>
-      </div>
+      ) : null}
 
+      {/* Battery animation overlay */}
       {showBattery && (
-        <div style={{ position: 'absolute', inset: 0, zIndex: 15 }}>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 15,
+            animation: 'fadeIn 0.4s ease both',
+          }}
+        >
           <BatteryAnimation activationKey={activationKeys[activeIndex]} />
         </div>
       )}
 
+      {/* Spec overlay */}
       {showSpecs && (
-        <div style={{ position: 'absolute', inset: 0, zIndex: 15 }}>
-          <SpecOverlay />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 15,
+            animation: 'specSlideIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both',
+          }}
+        >
+          <SpecOverlay accent={accent} />
         </div>
       )}
 
+      {/* Hotspots */}
       {scene.hotspots?.map((hotspot, index) => {
         const hotspotKey = `${scene.id}-${index}`
         const active = selectedHotspot === hotspotKey
@@ -411,17 +520,19 @@ export default function StickyCarScene({
             y={hotspot.y}
             active={active}
             accent={accent}
-            onToggle={() => setSelectedHotspot((prev) => (prev === hotspotKey ? null : hotspotKey))}
+            onToggle={() => handleHotspotToggle(hotspotKey)}
           />
         )
       })}
 
+      {/* Scene text */}
       <SceneText
         key={scene.id}
         scene={scene}
         index={activeIndex}
         total={scenes.length}
         localProgress={localProgress}
+        heroCta={heroCta}
       />
     </div>
   )

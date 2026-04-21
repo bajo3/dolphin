@@ -19,24 +19,34 @@ const globalStyles = `
   }
 
   @keyframes slideUpFade {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(22px); }
     to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes specSlideIn {
+    from { opacity: 0; transform: translateX(18px); }
+    to   { opacity: 1; transform: translateX(0); }
   }
 
   @keyframes hotspotGlow {
     0%, 100% {
       transform: scale(1);
-      box-shadow: 0 0 0 0 rgba(199, 255, 65, 0.48);
+      box-shadow: 0 0 0 0 rgba(199, 255, 65, 0.42);
     }
     50% {
-      transform: scale(1.14);
-      box-shadow: 0 0 0 12px rgba(199, 255, 65, 0);
+      transform: scale(1.12);
+      box-shadow: 0 0 0 10px rgba(199, 255, 65, 0);
     }
   }
 
   @keyframes ctaPulse {
     0%, 100% { box-shadow: 0 4px 20px rgba(37,211,102,0.4); }
-    50% { box-shadow: 0 4px 34px rgba(37,211,102,0.7), 0 0 0 5px rgba(37,211,102,0.08); }
+    50% { box-shadow: 0 4px 34px rgba(37,211,102,0.72), 0 0 0 5px rgba(37,211,102,0.08); }
   }
 
   @keyframes bydSpin {

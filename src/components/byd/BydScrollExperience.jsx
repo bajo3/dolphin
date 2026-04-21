@@ -18,26 +18,14 @@ function getStageStyle(mode) {
   }
 
   if (mode === 'before') {
-    return {
-      ...baseStyle,
-      position: 'absolute',
-      top: 0,
-    }
+    return { ...baseStyle, position: 'absolute', top: 0 }
   }
 
   if (mode === 'after') {
-    return {
-      ...baseStyle,
-      position: 'absolute',
-      bottom: 0,
-    }
+    return { ...baseStyle, position: 'absolute', bottom: 0 }
   }
 
-  return {
-    ...baseStyle,
-    position: 'fixed',
-    top: 0,
-  }
+  return { ...baseStyle, position: 'fixed', top: 0 }
 }
 
 function preloadImage(url, onComplete) {
@@ -70,15 +58,20 @@ export default function BydScrollExperience() {
     Object.fromEntries(scenes.map((_, index) => [index, index === 0 ? 1 : 0]))
   )
   const [loadedImages, setLoadedImages] = useState(() => new Set())
+  const [isAutoPlaying, setIsAutoPlaying] = useState(false)
+
   const containerRef = useRef(null)
   const previousIndexRef = useRef(0)
   const tickingRef = useRef(false)
+  const autoPlayTimerRef = useRef(null)
+  const autoPlayIndexRef = useRef(0)
 
   const sceneImageUrls = useMemo(
     () => scenes.flatMap((scene) => [scene.thumb, scene.imagen].filter(Boolean)),
     [scenes]
   )
 
+  // Preload first 3 scenes on mount
   useEffect(() => {
     const initialUrls = scenes
       .slice(0, 3)
@@ -98,6 +91,7 @@ export default function BydScrollExperience() {
     return () => cleanups.forEach((cleanup) => cleanup())
   }, [scenes])
 
+  // Rolling preload ahead of active scene
   useEffect(() => {
     const preloadTargets = [
       scenes[scrollState.activeIndex],
@@ -121,6 +115,7 @@ export default function BydScrollExperience() {
     return () => cleanups.forEach((cleanup) => cleanup())
   }, [scenes, scrollState.activeIndex, scrollState.nextIndex])
 
+  // Scroll engine
   useEffect(() => {
     function calculateScrollState() {
       const container = containerRef.current
@@ -157,13 +152,7 @@ export default function BydScrollExperience() {
           return prev
         }
 
-        return {
-          activeIndex,
-          progress,
-          localProgress,
-          nextIndex,
-          stageMode,
-        }
+        return { activeIndex, progress, localProgress, nextIndex, stageMode }
       })
 
       if (previousIndexRef.current !== activeIndex) {
@@ -177,7 +166,6 @@ export default function BydScrollExperience() {
 
     function requestTick() {
       if (tickingRef.current) return
-
       tickingRef.current = true
       window.requestAnimationFrame(() => {
         tickingRef.current = false
@@ -195,29 +183,88 @@ export default function BydScrollExperience() {
     }
   }, [scenes])
 
+  // Smooth scroll to a scene index with RAF animation
+  function scrollToScene(index) {
+    const container = containerRef.current
+    if (!container) return
+
+    const viewportHeight = window.innerHeight
+    const containerTop = container.offsetTop
+    const containerHeight = container.offsetHeight
+    const maxScroll = Math.max(containerHeight - viewportHeight, 1)
+    const progress = index / Math.max(scenes.length - 1, 1)
+    const targetY = containerTop + progress * maxScroll
+
+    const startY = window.scrollY
+    const distance = targetY - startY
+    const duration = 900
+    const startTime = performance.now()
+
+    function step(now) {
+      const elapsed = now - startTime
+      const t = Math.min(elapsed / duration, 1)
+      const eased = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+      window.scrollTo(0, startY + distance * eased)
+      if (t < 1) requestAnimationFrame(step)
+    }
+
+    requestAnimationFrame(step)
+  }
+
+  // Autoplay: advance scenes on a timer
+  useEffect(() => {
+    if (!isAutoPlaying) return
+
+    autoPlayTimerRef.current = setInterval(() => {
+      const nextIndex = autoPlayIndexRef.current + 1
+
+      if (nextIndex >= scenes.length) {
+        setIsAutoPlaying(false)
+        return
+      }
+
+      autoPlayIndexRef.current = nextIndex
+      scrollToScene(nextIndex)
+    }, 4800)
+
+    return () => {
+      if (autoPlayTimerRef.current) {
+        clearInterval(autoPlayTimerRef.current)
+        autoPlayTimerRef.current = null
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAutoPlaying, scenes.length])
+
+  // Cancel autoplay on user wheel/touch interaction
+  useEffect(() => {
+    if (!isAutoPlaying) return
+
+    function handleUserInput() {
+      setIsAutoPlaying(false)
+    }
+
+    window.addEventListener('wheel', handleUserInput, { passive: true, once: true })
+    window.addEventListener('touchstart', handleUserInput, { passive: true, once: true })
+
+    return () => {
+      window.removeEventListener('wheel', handleUserInput)
+      window.removeEventListener('touchstart', handleUserInput)
+    }
+  }, [isAutoPlaying])
+
+  function toggleAutoPlay() {
+    if (isAutoPlaying) {
+      setIsAutoPlaying(false)
+    } else {
+      autoPlayIndexRef.current = 0
+      scrollToScene(0)
+      setIsAutoPlaying(true)
+    }
+  }
+
   const activeScene = scenes[scrollState.activeIndex]
   const nextScene = scenes[scrollState.nextIndex]
-
-  useEffect(() => {
-    if (!import.meta.env.DEV) return
-
-    console.log('[BYD_SCROLL]', {
-      activeIndex: scrollState.activeIndex,
-      nextIndex: scrollState.nextIndex,
-      stageMode: scrollState.stageMode,
-      sceneId: activeScene?.id,
-      image: activeScene?.imagen ?? null,
-      progress: Number(scrollState.progress.toFixed(3)),
-      localProgress: Number(scrollState.localProgress.toFixed(3)),
-    })
-  }, [
-    activeScene,
-    scrollState.activeIndex,
-    scrollState.localProgress,
-    scrollState.nextIndex,
-    scrollState.progress,
-    scrollState.stageMode,
-  ])
 
   return (
     <div
@@ -240,9 +287,17 @@ export default function BydScrollExperience() {
           activationKeys={activationKeys}
           loadedImages={loadedImages}
           totalImageCount={sceneImageUrls.length}
+          isAutoPlaying={isAutoPlaying}
+          onToggleAutoPlay={toggleAutoPlay}
+          onGoToScene={scrollToScene}
         />
-        <ScrollProgress current={scrollState.activeIndex} total={scenes.length} />
-        <FloatingCTA />
+        <ScrollProgress
+          current={scrollState.activeIndex}
+          total={scenes.length}
+          accent={activeScene?.accent}
+          onGoToScene={scrollToScene}
+        />
+        <FloatingCTA isHero={scrollState.activeIndex === 0} />
       </div>
     </div>
   )

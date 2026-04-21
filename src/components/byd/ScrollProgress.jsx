@@ -1,4 +1,6 @@
-export default function ScrollProgress({ current, total }) {
+export default function ScrollProgress({ current, total, accent, onGoToScene }) {
+  const activeColor = accent ?? '#a3e635'
+
   return (
     <div
       style={{
@@ -16,16 +18,23 @@ export default function ScrollProgress({ current, total }) {
       {Array.from({ length: total }).map((_, i) => {
         const isActive = i === current
         return (
-          <div
+          <button
             key={i}
+            type="button"
+            aria-label={`Ir a escena ${i + 1}`}
+            onClick={() => onGoToScene?.(i)}
             style={{
-              width: isActive ? '3px' : '3px',
+              width: '3px',
               height: isActive ? '20px' : '4px',
               borderRadius: '2px',
-              background: isActive ? '#a3e635' : 'rgba(255,255,255,0.22)',
-              transition: 'height 0.35s cubic-bezier(0.4,0,0.2,1), background 0.35s ease',
+              background: isActive ? activeColor : 'rgba(255,255,255,0.22)',
+              transition: 'height 0.35s cubic-bezier(0.4,0,0.2,1), background 0.4s ease',
               flexShrink: 0,
-              boxShadow: isActive ? '0 0 6px rgba(163,230,53,0.6)' : 'none',
+              boxShadow: isActive ? `0 0 8px ${activeColor}80` : 'none',
+              border: 0,
+              padding: 0,
+              cursor: 'pointer',
+              display: 'block',
             }}
           />
         )
